@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Strict Content Security Policy: only files from this site may run. No inline scripts, no third parties. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Turn your own documents into a typing test. Files are read in your browser and never uploaded.">
+  <title>TypeMyFile – Typing Practice From Your Documents</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='monospace'%3ET_%3C/text%3E%3C/svg%3E">
+  <script src="vendor/mammoth.browser.min.js" defer></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">TypeMyFile</a>
+      <nav aria-label="Site">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <!-- Step 1: upload -->
+    <section id="upload-section" aria-labelledby="upload-heading">
+      <h1 id="upload-heading">Practice typing with your own documents</h1>
+      <p class="lede">Upload a <strong>.txt</strong>, <strong>.pdf</strong>, <strong>.docx</strong> or <strong>.doc</strong> file. It's read <strong>only on your device</strong>: nothing is uploaded, stored or tracked.</p>
+
+      <label id="drop-zone" class="drop-zone" for="file-input">
+        <input id="file-input" type="file" accept=".txt,.pdf,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <span class="drop-icon" aria-hidden="true">⬆</span>
+        <span class="drop-title">Choose a file or drag it here</span>
+        <span class="drop-hint">Max 10 MB · .txt, .pdf, .docx, .doc</span>
+      </label>
+
+      <details class="paste-box">
+        <summary>Or paste text instead</summary>
+        <label for="paste-input" class="visually-hidden">Text to practise</label>
+        <textarea id="paste-input" rows="5" maxlength="2000000" placeholder="Paste any text here…"></textarea>
+        <button id="paste-go" class="btn" type="button">Use this text</button>
+      </details>
+
+      <p id="upload-status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- Step 2: game -->
+    <section id="game-section" aria-labelledby="game-heading" hidden>
+      <div class="game-top">
+        <h2 id="game-heading">
+          <span id="file-name"></span>
+          <span id="passage-label" class="muted"></span>
+        </h2>
+        <div class="controls">
+          <label class="check"><input id="simplify" type="checkbox" checked> Simplify punctuation</label>
+        </div>
+      </div>
+
+      <p id="game-note" class="notice small" role="status" hidden></p>
+
+      <dl class="stats" aria-label="Live statistics">
+        <div><dt>WPM</dt><dd id="stat-wpm">0</dd></div>
+        <div><dt>Accuracy</dt><dd id="stat-acc">100%</dd></div>
+        <div><dt>Time</dt><dd id="stat-time">0:00</dd></div>
+        <div><dt>Progress</dt><dd id="stat-progress">0%</dd></div>
+      </dl>
+
+      <div class="text-wrap">
+        <div id="text-box" class="text-box" aria-describedby="type-hint">
+          <div id="text-display" class="text-display" aria-hidden="true"></div>
+        </div>
+        <!-- Kept outside the scrolling box so the browser never scrolls it to show the caret. -->
+        <label for="type-input" class="visually-hidden">Type the text here</label>
+        <textarea id="type-input" class="type-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-describedby="type-hint"></textarea>
+      </div>
+      <p id="type-hint" class="muted small" aria-live="polite"></p>
+      <p id="passage-sr" class="visually-hidden" aria-live="off"></p>
+
+      <div class="actions">
+        <button id="btn-finish" class="btn" type="button">Finish &amp; see results</button>
+        <button id="btn-restart" class="btn" type="button">Start over</button>
+        <button id="btn-new-file" class="btn btn-ghost" type="button">Use another file</button>
+      </div>
+
+      <div id="results" class="results" hidden role="region" aria-labelledby="results-heading" tabindex="-1">
+        <h3 id="results-heading">Your results</h3>
+        <dl class="stats stats-big">
+          <div><dt>Net WPM</dt><dd id="res-wpm"></dd></div>
+          <div><dt>Raw WPM</dt><dd id="res-raw"></dd></div>
+          <div><dt>Accuracy</dt><dd id="res-acc"></dd></div>
+          <div><dt>Errors</dt><dd id="res-err"></dd></div>
+          <div><dt>Time</dt><dd id="res-time"></dd></div>
+        </dl>
+        <p id="session-summary" class="muted"></p>
+        <div class="actions">
+          <button id="btn-continue" class="btn btn-primary" type="button">Keep typing</button>
+          <button id="btn-again" class="btn" type="button">Start over</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Your files never leave your device. No cookies, no analytics, no accounts.</p>
+      <p><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Use</a> · <a href="privacy.html#accessibility">Accessibility</a></p>
+    </div>
+  </footer>
+</body>
+</html>

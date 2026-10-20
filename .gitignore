@@ -1,0 +1,15 @@
+# Temporary folder used by setup-vendor.ps1
+vendor-tmp/
+node_modules/
+
+# Local tool settings
+.claude/
+
+# OS clutter
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Never commit secrets
+.env
+.env.*
